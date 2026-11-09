@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RF Shift Report</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#c8102e"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--tx:#1c1b19;--mut:#6d6a63;--bd:#dedbd3;--ac:#c8102e;--ok:#128c4a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--card:#222120;--tx:#f1efe9;--mut:#a09c92;--bd:#3a3834;--ac:#ff4d63;--ok:#3ecf80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--card:#222120;--tx:#f1efe9;--mut:#a09c92;--bd:#3a3834;--ac:#ff4d63;--ok:#3ecf80;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:560px;margin:0 auto;padding:12px 12px 40px}
+h1{font-size:18px;margin:4px 0 10px}h2{font-size:14px;margin:0 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.tabs,.seg{display:flex;gap:6px;margin-bottom:12px}
+.tabs button,.seg button{flex:1;padding:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-size:15px}
+.tabs button.on,.seg button.on{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+input,textarea,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{display:block;width:100%;padding:12px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:15px;font-weight:600;margin-top:8px}
+.btn.sec{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.btn.wa{background:var(--ok)}
+.grid{display:grid;grid-template-columns:1fr 92px 54px;gap:5px;align-items:center}
+.grid span{font-size:13px}.grid input{padding:6px;text-align:right}
+.hint{font-size:12px;color:var(--mut);margin:6px 0 0}
+#prev{max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;display:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chips button{padding:8px 12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:20px}
+.chips button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ph{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-items:start}
+.ph div{position:relative}.ph img{width:100%;height:auto;border-radius:6px;display:block;background:#000}
+.ph b{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;font-size:13px}
+#out{min-height:260px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+#gridimg{max-width:100%;border-radius:8px;margin-top:8px}
+.tabs button{font-size:13px;padding:10px 4px}.sc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sc>div{position:relative}.sc img{width:100%;height:auto;border-radius:6px;display:block;border:1px solid var(--bd)}.sc b{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-size:15px}.sc i{position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.65);color:#fff;border-radius:6px;padding:1px 6px;font-size:11px;font-style:normal}.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--tx);margin:10px 0 0}.chk input{width:auto}.hide{display:none}.kp{margin-bottom:10px}.kp b{font-size:14px}.low{color:var(--ac);font-size:12px;font-weight:600}
+#cov{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}#cov.hide{display:none}
+#vid{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+.cbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));background:#000;color:#fff}
+.cbar select,.cbar button{background:#222;color:#fff;border:1px solid #444;border-radius:10px;padding:10px;font-size:14px}
+#shut{width:70px;height:70px;border-radius:50%;border:5px solid #fff;background:#c8102e;padding:0}
+#cinfo{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:8px;right:8px;color:#ffd400;font:600 13px system-ui;text-shadow:0 1px 3px #000}
+.gimg{width:100%;border-radius:8px;margin:6px 0;display:block}
+</style></head><body>
+<h1>RF Shift Report</h1>
+<div class="tabs"><button id="t1" class="on">Sales Report</button><button id="t2">Waste Report</button><button id="t3">End Day Receipt Scan</button></div>
+
+<div id="p1">
+ <div class="seg"><button id="m_shift" class="on">End Shift Report</button><button id="m_day">End Day Report</button></div>
+ <p class="hint" id="modehint" style="margin:-6px 0 10px"></p>
+ <div class="card"><h2>Info</h2>
+  <div class="row"><div><label>Branch</label><input id="branch" value="RF PALANGKARAYA"></div><div><label>Date</label><input id="date" type="date"></div></div>
+  <label>Manager on duty</label><input id="mod" placeholder="MOD name">
+  <label>Position (shown in report)</label><select id="role"><option>Store Manager</option><option>Floor Manager</option><option>Crew Leader</option></select>
+  <label>Anthropic API key (for receipt scanning; stored only on this phone)</label><input id="key" type="password" placeholder="sk-ant-..." autocomplete="off">
+  <div class="row"><div><label>Sales target (month)</label><input id="target" inputmode="numeric"></div><div><label>Sales achievement (to date)</label><input id="ach" inputmode="numeric"></div></div>
+ </div>
+ <div class="card"><h2>1. POS receipt photo</h2>
+  <div class="seg" id="shseg"><button id="s_lunch" class="on">Lunch</button><button id="s_dinner">Dinner</button><button id="s_total">Total</button></div>
+  <label id="filelbl">Receipt photo: take it with the camera or choose from gallery</label>
+  <input id="file" type="file" accept="image/*" class="hide">
+  <input id="fcam" type="file" accept="image/*" capture="environment" class="hide">
+  <div class="row"><button class="btn sec" id="fgal">🖼 Choose from gallery</button><button class="btn" id="fshot">📷 Take photo</button></div>
+  <img id="prev" alt="Receipt">
+  <button class="btn" id="scan" disabled>🔍 Scan receipt with AI</button>
+  <p class="hint" id="scanmsg">Take or choose a receipt photo first, then tap Scan.</p>
+  <label>Manual backup: paste OCR text (optional)</label>
+  <textarea id="ocr" rows="4" placeholder="GOFOOD&#10;- Number Of Bill : 101&#10;- Sales : 12.466.800"></textarea>
+  <div class="row"><button class="btn" id="parse">Read data</button><button class="btn sec" id="sample">Fill sample</button></div>
+ </div>
+ <div class="card"><h2>2. Check numbers (<span id="shl">Lunch</span>)</h2>
+  <div class="grid" id="tbl"></div>
+  <p class="hint" id="sumline"></p>
+ </div>
+ <div class="card"><h2>3. Speed of Service, Self Order, Upselling</h2>
+  <div id="kpi"></div>
+  <p class="hint">Filled in manually by the manager. Sales &amp; tc here are automatic from the receipt figures.</p>
+ </div>
+ <div class="card"><h2>4. WhatsApp report</h2>
+  <textarea id="out"></textarea>
+  <button class="btn wa" id="wa">Send to WhatsApp</button>
+  <button class="btn sec" id="copy">Copy text</button>
+ </div>
+</div>
+
+<div id="p2" class="hide">
+ <div class="card"><h2>Waste photos</h2>
+  <div class="chips" id="cats"></div>
+  <button class="btn" id="cam">📸 Open app camera (photo + time + location)</button>
+  <label>Or choose from gallery (no time &amp; location stamp)</label>
+  <input id="wfile" type="file" accept="image/*" multiple>
+  <p class="hint">Only photos taken directly with the app camera get a stamp with time, date, address and GPS coordinates. Gallery photos are saved as-is, without a stamp. The address needs internet; offline only coordinates are shown. Photos are kept on this phone until closing.</p>
+ </div>
+ <div id="gal"></div>
+ <div class="card"><h2>Closing: build grid</h2>
+  <div class="row"><div><label>Columns per row</label><select id="gcols"><option value="3">3 columns</option><option value="2">2 columns (larger photos)</option></select></div>
+  <div><label>Output</label><select id="gmode"><option value="all">All categories → 1 image</option><option value="each">Each category → its own image</option></select></div></div>
+  <button class="btn" id="mk">Build grid</button>
+  <div id="gout"></div>
+  <p class="hint" id="gmsg"></p>
+  <p class="hint">Single-category grid: use the "Category grid" button on each category above.</p>
+ </div>
+</div>
+
+<div id="p3" class="hide">
+ <div class="card"><h2>End Day Receipt Scan</h2>
+  <p class="hint" style="margin:0 0 8px">Upload photos of end day receipts, EDC screens or POS screens. All images are combined into one PDF file (1 image = 1 page).</p>
+  <input id="sfile" type="file" accept="image/*" multiple class="hide">
+  <input id="scam" type="file" accept="image/*" capture="environment" class="hide">
+  <div class="row"><button class="btn" id="sgal">🖼 Choose from gallery</button><button class="btn sec" id="sshot">📷 Take photo</button></div>
+  <label class="chk"><input type="checkbox" id="senh"> Document scan mode (grayscale + contrast, clearer text)</label>
+  <p class="hint" id="smsg"></p>
+ </div>
+ <div class="card"><h2>Images (<span id="scnt">0</span>)</h2>
+  <div class="sc" id="slist"></div>
+  <p class="hint" id="sempty">No images yet.</p>
+ </div>
+ <div class="card"><h2>PDF</h2>
+  <p class="hint" style="margin:0" id="sname"></p>
+  <button class="btn" id="spdf">⬇ Download PDF</button>
+  <button class="btn wa" id="sshare">Share PDF (WhatsApp, etc.)</button>
+  <button class="btn sec" id="sclear">🗑 Delete all images</button>
+  <p class="hint">Images are kept on this phone until deleted or for 2 days. The file name uses today's date.</p>
+ </div>
+</div>
+
+<div id="cov" class="hide"><div id="cinfo"><div id="cloc">📍 Finding location…</div><div id="ccount"></div></div><video id="vid" playsinline muted autoplay></video><div class="cbar"><button id="cdone">Done</button><button id="shut" aria-label="Take photo"></button><select id="ccat"></select></div></div>
+<script>
+const K=[['bigorder','Big Order'],['appdine','Apps Dine in'],['apptake','Apps Take Away'],['webtake','Web Take Away'],['delivery','Delivery'],['dinein','Dine in'],['takeaway','Take away'],['gofood','Gofood'],['grabfood','Grabfood'],['shopee','ShopeeFood'],['kdine','Kiosk Dine in'],['ktake','Kiosk Take Away'],['qrdine','QR Dine In'],['qrtake','QR Take Away']];
+const MAP={'BIG ORDER':'bigorder','APPS DINE IN':'appdine','APPS TAKE AWAY':'apptake','WEB TAKE AWAY':'webtake','DELIVERY':'delivery','DINE IN':'dinein','TAKE AWAY':'takeaway','GOFOOD':'gofood','GRABFOOD':'grabfood','SHOPEEFOOD':'shopee','KIOSK DINE IN':'kdine','KIOSK TAKE AWAY':'ktake','QR DINE IN':'qrdine','QR TAKE AWAY':'qrtake'};
+const CATS=['Chicken','BBQ Sauce','Rice','Pink Lava','Fruitarian','Coating'];
+const MON=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const SAMPLE=`DINE IN
+- Number Of Bill : 5
+- Sales : 88.182
+GOFOOD
+- Number Of Bill : 101
+- Sales : 12.466.800
+GRABFOOD
+- Number Of Bill : 31
+- Sales : 4.008.177
+KIOSK DINE IN
+- Number Of Bill : 53
+- Sales : 6.104.542
+KIOSK TAKE AWAY
+- Number Of Bill : 21
+- Sales : 3.985.455
+QR DINE IN
+- Number Of Bill : 8
+- Sales : 1.044.999
+QR TAKE AWAY
+- Number Of Bill : 1
+- Sales : 32.727
+SHOPEEFOOD
+- Number Of Bill : 42
+- Sales : 4.648.137
+TAKE AWAY
+- Number Of Bill : 4
+- Sales : 433.636
+Total Bill : 266`;
+const $=i=>document.getElementById(i);
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const fmt=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+let st=ls.get('rf-set',{branch:'RF PALANGKARAYA',mod:'',target:'',ach:''});
+const MIN=0;/* minimum photos per category for the grid; 0 = no requirement (manager can upload any amount) */
+const norm=d=>{d=d||{};['lunch','dinner','total'].forEach(k=>d[k]=d[k]||{});d.meta=d.meta||{};['lunch','dinner','total'].forEach(k=>d.meta[k]=d.meta[k]||{sos:'',so:'',up:''});return d};
+let shift='lunch',mode=st.mode=='day'?'day':'shift',cat=CATS[0],data=norm({}),photos=[],rcpts={};
+$('date').value=today();
+$('key').value=localStorage.getItem('rf-key')||'';$('key').oninput=()=>localStorage.setItem('rf-key',$('key').value.trim());
+if(!st.role)st.role='Floor Manager';['branch','mod','role','target','ach'].forEach(k=>{$(k).value=st[k]||'';$(k).oninput=()=>{st[k]=$(k).value;ls.set('rf-set',st);out()}});
+const dk=()=>'rf-d-'+$('date').value, pk=()=>'rf-w-'+$('date').value;
+function cleanOld(){try{const cut=new Date(Date.now()-2*864e5),k0='rf-w-'+cut.getFullYear()+'-'+String(cut.getMonth()+1).padStart(2,'0')+'-'+String(cut.getDate()).padStart(2,'0');for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith('rf-w-')&&k<k0)localStorage.removeItem(k)}}catch(e){}}
+async function load(){cleanOld();cleanDb();photos=[];data=norm(ls.get(dk(),{}));tbl();kpi();out();photos=(await dbGet(pk()))||[];gal()}
+$('date').onchange=load;
+function save(){ls.set(dk(),data)}
+
+$('t1').onclick=()=>tab(1);$('t2').onclick=()=>tab(2);
+function tab(n){[1,2,3].forEach(k=>{$('p'+k).classList.toggle('hide',n!=k);$('t'+k).classList.toggle('on',n==k)});if(n==3)loadScans()}
+$('t3').onclick=()=>tab(3);
+const SHN={lunch:'Lunch',dinner:'Dinner',total:'Total'};
+function setShift(s){shift=s;['lunch','dinner','total'].forEach(k=>$('s_'+k).classList.toggle('on',k==s));showPrev();tbl();out()}
+$('s_lunch').onclick=()=>setShift('lunch');$('s_dinner').onclick=()=>setShift('dinner');$('s_total').onclick=()=>setShift('total');
+function setMode(m){mode=m;st.mode=m;ls.set('rf-set',st);if(m=='shift')shift='lunch';
+ $('m_shift').classList.toggle('on',m=='shift');$('m_day').classList.toggle('on',m=='day');$('shseg').classList.toggle('hide',m=='shift');
+ $('modehint').textContent=m=='shift'?'For the Lunch manager: Lunch sales report only.':'For the Dinner manager: upload the Lunch, Dinner and Total receipts.';
+ setShift(shift);kpi()}
+$('m_shift').onclick=()=>setMode('shift');$('m_day').onclick=()=>setMode('day');
+function showPrev(){const r=rcpts[shift],p=$('prev');
+ $('filelbl').textContent=SHN[shift]+' receipt photo: take it with the camera or choose from gallery';
+ if(r){p.src=r.url;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}
+ $('scan').disabled=!r;$('scanmsg').textContent=r?'Ready. Tap Scan (needs internet & API key).':'Take or choose the '+SHN[shift]+' receipt photo first, then tap Scan.'}
+
+
+const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
+async function askAI(blob){
+ const key=($('key').value||'').trim();if(!key)throw new Error('Enter the API key in the Info section first.');
+ const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:1500,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:await b64(blob)}},{type:'text',text:PROMPT}]}]})});
+ const j=await r.json();if(!r.ok)throw new Error((j.error&&j.error.message)||('HTTP '+r.status));
+ return j.content.filter(c=>c.type=='text').map(c=>c.text).join('');
+}
+const PROMPT=`You are reading a photo of a POS "Shift Summary" thermal receipt from an Indonesian restaurant. Find the section "Sales By Visit Purpose". For each visit purpose read "Number Of Bill" (count) and "Sales" (integer rupiah; dots are thousands separators, e.g. 12.466.800 = 12466800). Map names to keys: DINE IN=dinein, TAKE AWAY=takeaway, GOFOOD=gofood, GRABFOOD=grabfood, SHOPEEFOOD=shopee, KIOSK DINE IN=kdine, KIOSK TAKE AWAY=ktake, QR DINE IN=qrdine, QR TAKE AWAY=qrtake, APPS DINE IN=appdine, APPS TAKE AWAY=apptake, WEB TAKE AWAY=webtake, DELIVERY=delivery, BIG ORDER=bigorder. Also read "Total Bill" and "Total Sales" of that section, and the date. Reply with ONLY JSON, no markdown, like: {"date":"26-09-2026","items":{"gofood":{"s":12466800,"c":101}},"total_bills":266,"total_sales":32812655}. Omit categories not on the receipt. Never guess; use 0 if unreadable.`;
+function shrink(f){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const M=2200,r=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*r;c.height=im.height*r;c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(b=>b?res(b):rej(),'image/jpeg',.82)};im.onerror=rej;im.src=URL.createObjectURL(f)})}
+const pickRcpt=e=>{const f=e.target.files[0];if(!f)return;rcpts[shift]={f,url:URL.createObjectURL(f)};showPrev();e.target.value=''};
+$('file').onchange=pickRcpt;$('fcam').onchange=pickRcpt;$('fgal').onclick=()=>$('file').click();$('fshot').onclick=()=>$('fcam').click();
+$('scan').onclick=async()=>{
+ const m=$('scanmsg'),sh=shift,r=rcpts[sh];
+ if(!r){m.textContent='Take or choose a photo first.';return}
+ $('scan').disabled=true;m.textContent='Reading '+SHN[sh]+' receipt… (10–60 seconds)';
+ try{
+  const blob=await shrink(r.f);
+  const text=await askAI(blob);
+  const a=text.indexOf('{'),b=text.lastIndexOf('}');
+  const j=JSON.parse(text.slice(a,b+1)),res={};
+  Object.entries(j.items||{}).forEach(([k,v])=>{if(K.some(x=>x[0]==k))res[k]={s:parseInt(v.s)||0,c:parseInt(v.c)||0}});
+  data[sh]=res;save();if(shift==sh){tbl()}kpi();out();
+  const t=tot(res),ok=j.total_sales?t.s===j.total_sales:null;
+  if(shift==sh)m.textContent=(ok===false?'⚠ Calculated total Rp.'+fmt(t.s)+' ≠ receipt total Rp.'+fmt(j.total_sales)+'. Check the numbers in the table. ':'✓ Done, total matches the receipt. ')+(j.date?'Date on receipt: '+j.date+'. Make sure the report date is correct.':'');
+ }catch(err){
+  m.textContent='Failed: '+((err&&err.message)||'check internet / API key')+'. Try again or fill in the table manually.';
+ }finally{$('scan').disabled=!rcpts[shift]}
+};
+$('sample').onclick=()=>{$('ocr').value=SAMPLE};
+$('parse').onclick=()=>{
+ let cur=null,res={};
+ for(const line of $('ocr').value.split('\n')){
+  const l=line.trim();if(!l)continue;
+  const up=l.toUpperCase().replace(/\s+/g,' ').replace(/:$/,'').trim();
+  if(/^TOTAL/.test(up)){cur=null;continue}
+  if(MAP[up]){cur=MAP[up];res[cur]={s:0,c:0};continue}
+  if(!cur)continue;
+  const n=parseInt((l.split(':').pop()||'').replace(/\D/g,''))||0;
+  if(/bill/i.test(l))res[cur].c=n;else if(/sales/i.test(l))res[cur].s=n;
+ }
+ data[shift]=res;save();tbl();out();
+};
+
+function tbl(){
+ $('shl').textContent=SHN[shift];
+ const g=$('tbl');g.innerHTML='<b style="font-size:12px">Kategori</b><b style="font-size:12px;text-align:right">Sales</b><b style="font-size:12px;text-align:right">tc</b>';
+ const sh=shift;
+ K.forEach(([k,n])=>{
+  const o=data[sh][k]||{s:0,c:0};
+  const a=document.createElement('span');a.textContent=n;
+  const s=document.createElement('input');s.inputMode='numeric';s.value=o.s?fmt(o.s):'';
+  const c=document.createElement('input');c.inputMode='numeric';c.value=o.c||'';
+  const upd=()=>{data[sh][k]={s:parseInt(s.value.replace(/\D/g,''))||0,c:parseInt(c.value.replace(/\D/g,''))||0};save();sum();out()};
+  s.onchange=()=>{upd();s.value=data[sh][k].s?fmt(data[sh][k].s):''};c.onchange=upd;
+  g.append(a,s,c);
+ });sum();
+}
+function tot(d){let s=0,c=0;K.forEach(([k])=>{const o=d[k];if(o){s+=o.s;c+=o.c}});return{s,c}}
+const hasData=d=>K.some(([k])=>d[k]&&(d[k].s||d[k].c));
+function sumShifts(){const all={};K.forEach(([k])=>{const a=data.lunch[k]||{s:0,c:0},b=data.dinner[k]||{s:0,c:0};all[k]={s:a.s+b.s,c:a.c+b.c}});return all}
+const totalData=()=>hasData(data.total)?data.total:sumShifts();
+function sum(){const t=tot(data[shift]);let m='Total: Rp.'+fmt(t.s)+' / '+t.c+' tc';
+ if(shift=='total'){const a=tot(sumShifts());
+  if(!hasData(data.total))m='Empty → the report automatically adds Lunch + Dinner (Rp.'+fmt(a.s)+' / '+a.c+' tc).';
+  else if(a.s!==t.s||a.c!==t.c)m+='  ⚠ Lunch+Dinner = Rp.'+fmt(a.s)+' / '+a.c+' tc (different, please check).'}
+ $('sumline').textContent=m}
+function kpi(){
+ const w=$('kpi');w.innerHTML='';
+ (mode=='shift'?['lunch']:['lunch','dinner','total']).forEach(sh=>{
+  const box=document.createElement('div');box.className='kp';const b=document.createElement('b');b.textContent=SHN[sh];box.append(b);
+  [['sos','Speed of Service'],['so','Self Order'],['up','Upselling']].forEach(([f,n])=>{
+   const l=document.createElement('label');l.textContent=n;const i=document.createElement('input');i.value=data.meta[sh][f]||'';
+   i.oninput=()=>{data.meta[sh][f]=i.value;save();out()};box.append(l,i)});
+  w.append(box)});
+}
+const ln=(n,o)=>n+' : Rp.'+(o&&o.s?fmt(o.s):'')+',-/'+(o&&o.c?o.c:'')+' tc';
+function block(title,d){const t=tot(d);return title+'\n'+K.map(([k,n])=>ln(n,d[k])).join('\n')+'\n'+ln('Total Sales',t)+'\nBasket Size : Rp.'+(t.c?fmt(t.s/t.c):'')+',-'}
+function kblock(title,d,m){return title+'\n'+ln('Sales',tot(d))+'\nSpeed of Service : '+(m.sos||'')+'\nSelf Order : '+(m.so||'')+'\nUpselling : '+(m.up||'')}
+function out(){
+ const d=new Date($('date').value+'T00:00:00');
+ const ds=isNaN(d)?'':String(d.getDate()).padStart(2,'0')+' '+MON[d.getMonth()]+' '+d.getFullYear();
+ const parts=['Daily Sales Report '+($('branch').value||'')+'\nTanggal : '+ds];
+ if(mode=='shift'){
+  parts.push(block('Lunch',data.lunch),kblock('Lunch',data.lunch,data.meta.lunch));
+ }else{
+  const T=totalData();
+  parts.push(block('Lunch',data.lunch),block('Dinner',data.dinner),block('Total Sales (Lunch & Dinner)',T),
+   kblock('Lunch',data.lunch,data.meta.lunch),kblock('Dinner',data.dinner,data.meta.dinner),kblock('Total',T,data.meta.total));
+ }
+ const tg=parseInt(($('target').value||'').replace(/\D/g,''))||0,ac=parseInt(($('ach').value||'').replace(/\D/g,''))||0;
+ parts.push('Target sales : Rp.'+(tg?fmt(tg):'')+',-\nPencapaian sales : Rp.'+(ac?fmt(ac):'')+'-/ '+(tg?(ac/tg*100).toFixed(2):'')+' %');
+ parts.push('Atas perhatian dan kerjasamanya saya ucapkan terima kasih\nBest regards,\n'+($('mod').value||'Manager on duty')+'\n'+$('role').value);
+ $('out').value=parts.join('\n\n');
+}
+$('wa').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent($('out').value),'_blank');
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('out').value)}catch(e){$('out').select();document.execCommand('copy')}$('copy').textContent='Copied ✓';setTimeout(()=>$('copy').textContent='Copy text',1500)};
+
+/* Waste */
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('rf',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function dbGet(k){try{const d=await idb();return await new Promise(res=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined)})}catch(e){return undefined}}
+async function dbSet(k,v){try{const d=await idb();return await new Promise(res=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>res(true);t.onerror=()=>res(false);t.onabort=()=>res(false)})}catch(e){return false}}
+async function cleanDb(){try{const d=await idb(),c=new Date(Date.now()-2*864e5),k0=c.getFullYear()+'-'+String(c.getMonth()+1).padStart(2,'0')+'-'+String(c.getDate()).padStart(2,'0'),os=d.transaction('kv','readwrite').objectStore('kv');os.getAllKeys().onsuccess=e=>e.target.result.forEach(k=>{const m=/^rf-[we]-(\d{4}-\d\d-\d\d)$/.exec(String(k));if(m&&m[1]<k0)os.delete(k)})}catch(e){}}
+const savePh=async()=>{if(!await dbSet(pk(),photos))alert('Storage full. Build the grid, then delete old photos.')};
+function chips(){const c=$('cats');c.innerHTML='';CATS.forEach(n=>{const b=document.createElement('button');b.textContent=n;b.className=n==cat?'on':'';b.onclick=()=>{cat=n;chips()};c.append(b)})}
+chips();
+const DAY=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],p2=n=>String(n).padStart(2,'0');
+function tinfo(){const d=new Date(),o=-d.getTimezoneOffset(),a=Math.abs(o);return{time:p2(d.getHours())+':'+p2(d.getMinutes()),date:p2(d.getDate())+'/'+p2(d.getMonth()+1)+'/'+d.getFullYear(),day:DAY[d.getDay()],tz:'GMT'+(o<0?'-':'+')+p2(Math.floor(a/60))+':'+p2(a%60)}}
+let loc=null,place=null,placeAt=null,watchId=null,stream=null,geoBusy=false,gridsOut=[];
+const dist=(a,b)=>{const t=Math.PI/180,x=(b.lon-a.lon)*t*Math.cos((a.lat+b.lat)/2*t),y=(b.lat-a.lat)*t;return 6371e3*Math.hypot(x,y)};
+const getLoc=()=>new Promise(r=>{if(!navigator.geolocation)return r(null);navigator.geolocation.getCurrentPosition(p=>r({lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,at:Date.now()}),()=>r(null),{enableHighAccuracy:true,timeout:7000,maximumAge:20000})});
+async function reverse(l){
+ try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=en&lat='+l.lat+'&lon='+l.lon,{signal:AbortSignal.timeout?AbortSignal.timeout(6000):undefined});
+  const a=((await r.json()).address)||{};
+  return{district:[a.village||a.suburb,a.city_district].filter((v,i,x)=>v&&x.indexOf(v)==i).join(', ')||a.county||'',city:a.city||a.town||a.municipality||a.regency||a.county||'',province:a.state||'',country:a.country||'',post:a.postcode||''};
+ }catch(e){return null}
+}
+async function refreshPlace(l){if(geoBusy||(place&&placeAt&&dist(placeAt,l)<50))return;geoBusy=true;const o=await reverse(l);geoBusy=false;if(o){place=o;placeAt={lat:l.lat,lon:l.lon};showLoc()}}
+const placeLines=o=>o?[[o.district,o.city].filter(Boolean).join(', '),[o.province,o.country].filter(Boolean).join(', ')+(o.post?' '+o.post:'')].filter(v=>v.trim()):[];
+function showLoc(){$('cloc').textContent=loc?'📍 '+placeLines(place).join(' • ')+'  '+loc.lat.toFixed(5)+', '+loc.lon.toFixed(5)+' (±'+Math.round(loc.acc)+'m)':'📍 Finding location…'}
+async function stampSave(src,w,h,catg){
+ const T=tinfo();
+ const l=(loc&&Date.now()-loc.at<60000)?loc:await getLoc();
+ if(l){loc=l;if(!place||(placeAt&&dist(placeAt,l)>150)){const o=await reverse(l);if(o){place=o;placeAt={lat:l.lat,lon:l.lon}}}}
+ const M=1280,r=Math.min(1,M/Math.max(w,h)),W=Math.round(w*r),H=Math.round(h*r),c=document.createElement('canvas');c.width=W;c.height=H;
+ const x=c.getContext('2d');x.drawImage(src,0,0,W,H);
+ const u=Math.max(11,W/30),pad=u*.6,maxW=W-pad*2,small='600 '+u+'px sans-serif',lines=[];
+ const wrap=t=>{x.font=small;let cur='';for(const wd of t.split(' ')){const n=cur?cur+' '+wd:wd;if(x.measureText(n).width>maxW&&cur){lines.push(cur);cur=wd}else cur=n}if(cur)lines.push(cur)};
+ placeLines(place).forEach(wrap);
+ lines.push(l?'Lat '+l.lat.toFixed(5)+'  Long '+l.lon.toFixed(5)+'  (±'+Math.round(l.acc)+' m)':'Location unavailable');
+ lines.push(catg);
+ const bh=pad*2+u*2.9+lines.length*u*1.3,g=x.createLinearGradient(0,H-bh-u,0,H);
+ g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,.8)');
+ x.fillStyle=g;x.fillRect(0,H-bh-u,W,bh+u);x.textBaseline='top';
+ x.font='bold '+u*2.6+'px sans-serif';x.fillStyle='#fff';x.fillText(T.time,pad,H-bh+pad);const tw=x.measureText(T.time).width;
+ x.font='bold '+u+'px sans-serif';x.fillStyle='#ffd400';x.fillText(T.date+'  '+T.day,pad+tw+u*.6,H-bh+pad+u*.15);
+ x.font='600 '+u*.85+'px sans-serif';x.fillStyle='#fff';x.fillText(T.tz,pad+tw+u*.6,H-bh+pad+u*1.5);
+ x.font=small;lines.forEach((t,i)=>x.fillText(t,pad,H-bh+pad+u*2.9+i*u*1.3));
+ photos.push({cat:catg,t:T.date+' '+T.time,stamped:true,img:c.toDataURL('image/jpeg',.78)});
+ await savePh();gal();
+}
+$('wfile').onchange=async e=>{
+ const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+ for(const f of fs){try{
+  const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(f)});
+  const M=1280,r=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(im.src);
+  const T=tinfo();photos.push({cat,t:T.date+' '+T.time,stamped:false,img:c.toDataURL('image/jpeg',.82)});
+ }catch(err){}}
+ await savePh();gal();
+};
+const upCount=()=>{$('ccount').textContent=$('ccat').value+': '+photos.filter(p=>p.cat==$('ccat').value).length+(MIN?'/'+MIN+' min':'')+' photos • total today '+photos.length};
+$('ccat').onchange=()=>{cat=$('ccat').value;chips();upCount()};
+$('cam').onclick=async()=>{
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert('The in-app camera needs HTTPS. Use the gallery picker below.');return}
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920}},audio:false})}catch(e){alert('Camera could not be opened ('+e.message+'). Allow camera access or use the gallery picker.');return}
+ $('vid').srcObject=stream;$('cov').classList.remove('hide');
+ $('ccat').innerHTML=CATS.map(n=>'<option'+(n==cat?' selected':'')+'>'+n+'</option>').join('');upCount();showLoc();
+ if(navigator.geolocation)watchId=navigator.geolocation.watchPosition(p=>{loc={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,at:Date.now()};showLoc();refreshPlace(loc)},()=>{$('cloc').textContent='📍 Location unavailable (allow location in the browser)'},{enableHighAccuracy:true,maximumAge:5000});
+};
+$('shut').onclick=async()=>{
+ const v=$('vid');if(!v.videoWidth)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+ cat=$('ccat').value;chips();v.style.opacity=.3;setTimeout(()=>v.style.opacity=1,120);
+ await stampSave(c,c.width,c.height,cat);upCount();
+};
+$('cdone').onclick=()=>{if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(watchId!=null&&navigator.geolocation)navigator.geolocation.clearWatch(watchId);watchId=null;$('vid').srcObject=null;$('cov').classList.add('hide')};
+function gal(){
+ const g=$('gal');g.innerHTML='';
+ CATS.forEach(n=>{
+  const L=photos.map((p,i)=>({p,i})).filter(o=>o.p.cat==n);
+  const card=document.createElement('div');card.className='card';
+  const h=document.createElement('div');h.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px';
+  h.innerHTML='<h2 style="margin:0">'+n+' ('+L.length+')'+(MIN&&L.length<MIN?' <span class="low">'+(MIN-L.length)+' more needed</span>':'')+'</h2>';
+  if(L.length){const b=document.createElement('button');b.textContent='Category grid';b.className='btn sec';b.style.cssText='width:auto;margin:0;padding:8px 12px';b.onclick=async()=>{await makeGrids([n],true);$('gmsg').scrollIntoView({behavior:'smooth'})};h.append(b)}
+  card.append(h);
+  const w=document.createElement('div');w.className='ph';
+  L.forEach(({p,i})=>{const d=document.createElement('div');d.innerHTML='<img src="'+p.img+'" alt="'+n+' '+p.t+'"><b>×</b>';d.querySelector('b').onclick=()=>{photos.splice(i,1);savePh();gal()};w.append(d)});
+  card.append(w);g.append(card);
+ });
+}
+const img=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src});
+async function renderGrid(gs,cols){
+ /* each cell is 720px wide and photos are drawn uncropped so the time/location stamp stays readable; long grids are split into several pages */
+ const gap=16,cw=720,W=cols*cw+gap*(cols+1),head=96,sh=72,maxH=Math.floor(12e6/W);
+ const loaded=await Promise.all(gs.map(g=>Promise.all(g.L.map(p=>img(p.img)))));
+ const pages=[];let pg;const newPage=()=>{pg={cmds:[],y:head};pages.push(pg)};newPage();
+ gs.forEach((g,gi)=>{
+  const ims=loaded[gi];let hdr=false;
+  for(let i=0;i<ims.length;i+=cols){
+   const row=ims.slice(i,i+cols),rh=Math.max(...row.map(m=>cw*m.height/m.width));
+   if(pg.y+(hdr?0:sh)+rh+gap>maxH&&pg.y>head){newPage();hdr=false}
+   if(!hdr){pg.cmds.push({k:'s',t:g.n+' ('+g.L.length+' photos)'+(i?' — continued':''),y:pg.y});pg.y+=sh;hdr=true}
+   row.forEach((m,j)=>pg.cmds.push({k:'i',m,x:gap+j*(cw+gap),y:pg.y,w:cw,h:cw*m.height/m.width}));
+   pg.y+=rh+gap;
+  }
+  pg.y+=gap;
+ });
+ return pages.map((pg,pi)=>{
+  const c=document.createElement('canvas');c.width=W;c.height=Math.ceil(pg.y);
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,c.height);x.textBaseline='middle';x.fillStyle='#111';x.font='bold 44px sans-serif';
+  x.fillText('Waste Report '+($('branch').value||'')+' — '+$('date').value.split('-').reverse().join('/')+(pages.length>1?'  ('+(pi+1)+'/'+pages.length+')':''),gap,head/2);
+  pg.cmds.forEach(o=>{if(o.k=='s'){x.fillStyle='#c8102e';x.fillRect(0,o.y,W,sh-8);x.fillStyle='#fff';x.font='bold 34px sans-serif';x.fillText(o.t,gap,o.y+(sh-8)/2)}else x.drawImage(o.m,o.x,o.y,o.w,o.h)});
+  return c});
+}
+async function makeGrids(list,combined){
+ const cols=+$('gcols').value,gm=$('gmsg');
+ const lack=MIN?list.filter(n=>photos.filter(p=>p.cat==n).length<MIN):[];
+ if(lack.length){gm.textContent='At least '+MIN+' photos per category are required. Missing: '+lack.map(n=>n+' ('+photos.filter(p=>p.cat==n).length+'/'+MIN+')').join(', ')+'.';return}
+ const groups=list.map(n=>({n,L:photos.filter(p=>p.cat==n)})).filter(g=>g.L.length);
+ if(!groups.length){gm.textContent='No photos yet.';return}
+ gm.textContent='Menyusun grid…';gridsOut=[];
+ const sets=combined?[{name:groups.length>1?'All categories':groups[0].n,gs:groups}]:groups.map(g=>({name:g.n,gs:[g]}));
+ for(const s of sets){const cs=await renderGrid(s.gs,cols);cs.forEach((c,i)=>gridsOut.push({name:s.name+(cs.length>1?' hal '+(i+1):''),c}))}
+ showGrids();
+}
+function showGrids(){
+ const o=$('gout');o.innerHTML='';
+ gridsOut.forEach(it=>{const h=document.createElement('p');h.className='hint';h.textContent=it.name;const im=document.createElement('img');im.className='gimg';im.alt=it.name;im.src=it.c.toDataURL('image/jpeg',.88);
+  const b=document.createElement('button');b.className='btn wa';b.textContent='Share: '+it.name;b.onclick=()=>share([it]);o.append(h,im,b)});
+ if(gridsOut.length>1){const b=document.createElement('button');b.className='btn';b.textContent='Share all ('+gridsOut.length+' images)';b.onclick=()=>share(gridsOut);o.prepend(b)}
+ $('gmsg').textContent='Long-press an image to save it. Zoom in to read the location stamp.';
+}
+async function share(list){
+ const files=await Promise.all(list.map(it=>new Promise(r=>it.c.toBlob(b=>r(new File([b],'waste-'+it.name.replace(/\W+/g,'-')+'-'+$('date').value+'.jpg',{type:'image/jpeg'})),'image/jpeg',.9))));
+ try{if(navigator.canShare&&navigator.canShare({files}))await navigator.share({files,text:'Waste Report '+$('date').value});else $('gmsg').textContent='Sharing is not supported here; long-press the image to save it.'}catch(e){}
+}
+$('mk').onclick=()=>makeGrids(CATS,$('gmode').value=='all');
+
+/* End Day Receipt Scan -> PDF */
+let scans=[];const ek=()=>'rf-e-'+today();
+async function loadScans(){scans=(await dbGet(ek()))||[];scanUi()}
+const saveScans=async()=>{if(!await dbSet(ek(),scans))alert('Storage full. Download the PDF, then delete images.')};
+const pdfName=()=>{const d=new Date();return 'Endday_'+p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear()+'.pdf'};
+function scanUi(){
+ const l=$('slist');l.innerHTML='';
+ scans.forEach((o,i)=>{const d=document.createElement('div'),im=document.createElement('img'),x=document.createElement('b'),n=document.createElement('i');
+  im.src=o.img;im.alt='Page '+(i+1);x.textContent='×';x.setAttribute('aria-label','Delete image '+(i+1));n.textContent='Page '+(i+1);
+  x.onclick=async()=>{if(confirm('Delete the image on page '+(i+1)+'?')){scans.splice(i,1);await saveScans();scanUi()}};
+  d.append(im,x,n);l.append(d)});
+ $('scnt').textContent=scans.length;$('sempty').classList.toggle('hide',scans.length>0);
+ $('sname').textContent=scans.length?pdfName()+' • '+scans.length+(scans.length==1?' page':' pages'):'';
+ ['spdf','sshare','sclear'].forEach(k=>$(k).disabled=!scans.length);
+}
+async function procScan(f,enh){
+ const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(f)});
+ const M=1600,r=Math.min(1,M/Math.max(im.width,im.height)),w=Math.round(im.width*r),h=Math.round(im.height*r),c=document.createElement('canvas');
+ c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(im.src);
+ if(enh){
+  const d=x.getImageData(0,0,w,h),a=d.data,hist=new Array(256).fill(0);
+  for(let i=0;i<a.length;i+=4){const g=(a[i]*.299+a[i+1]*.587+a[i+2]*.114)|0;a[i]=a[i+1]=a[i+2]=g;hist[g]++}
+  const n=w*h;let lo=0,hi=255,acc=0;
+  for(let i=0;i<256;i++){acc+=hist[i];if(acc>=n*.02){lo=i;break}}
+  acc=0;for(let i=255;i>=0;i--){acc+=hist[i];if(acc>=n*.02){hi=i;break}}
+  if(hi-lo<20){lo=0;hi=255}
+  const k=255/(hi-lo);
+  for(let i=0;i<a.length;i+=4){const v=Math.max(0,Math.min(255,(a[i]-lo)*k));a[i]=a[i+1]=a[i+2]=v}
+  x.putImageData(d,0,0);
+ }
+ return{img:c.toDataURL('image/jpeg',.85),w,h};
+}
+async function addScans(files){
+ const fs=[...files];if(!fs.length)return;const enh=$('senh').checked,m=$('smsg');let ok=0;
+ for(let i=0;i<fs.length;i++){m.textContent='Processing image '+(i+1)+' / '+fs.length+'…';
+  try{scans.push(await procScan(fs[i],enh));ok++}catch(e){}}
+ await saveScans();scanUi();m.textContent=ok+(ok==1?' image':' images')+' added'+(ok<fs.length?', '+(fs.length-ok)+' could not be read':'')+'.';
+}
+$('sgal').onclick=()=>$('sfile').click();$('sshot').onclick=()=>$('scam').click();
+$('sfile').onchange=e=>{const f=e.target.files;addScans(f).then(()=>{e.target.value=''})};
+$('scam').onchange=e=>{const f=e.target.files;addScans(f).then(()=>{e.target.value=''})};
+function makePdf(list){
+ /* PDF is built by hand: each JPEG = 1 A4 page (portrait/landscape automatically), image scaled whole without cropping */
+ const parts=[],offs=[];let len=0;const add=x=>{parts.push(x);len+=x.length};
+ const obj=(n,body)=>{offs[n]=len;add(n+' 0 obj\n'+body+'\nendobj\n')};
+ const N=list.length,kids=list.map((_,i)=>(3+3*i)+' 0 R').join(' ');
+ add('%PDF-1.4\n');
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+ obj(2,'<< /Type /Pages /Kids ['+kids+'] /Count '+N+' >>');
+ list.forEach((o,i)=>{
+  const land=o.w>o.h,pw=land?842:595,ph=land?595:842,m=24,sc=Math.min((pw-2*m)/o.w,(ph-2*m)/o.h),iw=o.w*sc,ih=o.h*sc,x=(pw-iw)/2,y=(ph-ih)/2;
+  const bin=atob(o.img.split(',')[1]),by=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)by[k]=bin.charCodeAt(k);
+  const pn=3+3*i,cn=pn+1,im=pn+2,cs='q '+iw.toFixed(2)+' 0 0 '+ih.toFixed(2)+' '+x.toFixed(2)+' '+y.toFixed(2)+' cm /Im0 Do Q';
+  obj(pn,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pw+' '+ph+'] /Resources << /XObject << /Im0 '+im+' 0 R >> >> /Contents '+cn+' 0 R >>');
+  obj(cn,'<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream');
+  offs[im]=len;add(im+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+o.w+' /Height '+o.h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+by.length+' >>\nstream\n');
+  parts.push(by);len+=by.length;add('\nendstream\nendobj\n');
+ });
+ const total=3+3*N,xr=len;let t='xref\n0 '+total+'\n0000000000 65535 f \n';
+ for(let n=1;n<total;n++)t+=String(offs[n]).padStart(10,'0')+' 00000 n \n';
+ add(t+'trailer\n<< /Size '+total+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+ return new Blob(parts,{type:'application/pdf'});
+}
+$('spdf').onclick=()=>{
+ if(!scans.length)return;const b=makePdf(scans),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pdfName();document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(a.href),60000);$('smsg').textContent='PDF created: '+pdfName();
+};
+$('sshare').onclick=async()=>{
+ if(!scans.length)return;const f=new File([makePdf(scans)],pdfName(),{type:'application/pdf'});
+ try{if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],text:pdfName()});else $('smsg').textContent='Sharing is not supported here. Use the Download PDF button.'}catch(e){}
+};
+$('sclear').onclick=async()=>{if(scans.length&&confirm('Delete all '+scans.length+' images?')){scans=[];await saveScans();scanUi();$('smsg').textContent='All images deleted.'}};
+scanUi();
+
+setMode(mode);load();loadScans();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>

@@ -1,0 +1,15 @@
+RF Shift Report - how to install on a phone
+
+1. Open https://app.netlify.com/drop (free) and drag this FOLDER (the extracted zip contents) onto the page.
+   Netlify gives you an HTTPS link, e.g. https://random-name.netlify.app (HTTPS is required for camera & GPS).
+2. Open that link on the phone:
+   - Android (Chrome): menu ⋮ > "Install app" / "Add to home screen".
+   - iPhone (Safari): Share button > "Add to Home Screen".
+3. Open the app from the "RF Report" icon. Allow Camera and Location when asked.
+4. In the Info section, enter your Anthropic API key (console.anthropic.com > API Keys) so receipt scanning works.
+   Create a dedicated key with a spend limit.
+
+UPDATING TO A NEW VERSION
+- Netlify: Deploys > drag the folder onto the "drag and drop" box again (overwrites the old version).
+- On the phone: fully close the app, then open it again 2 times (or delete the app and reinstall) so the new version becomes active.
+- Waste photos from older versions are not carried over to this version.
